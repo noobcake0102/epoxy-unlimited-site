@@ -27,6 +27,7 @@
       <nav class="site-nav">
         <a href="#services">Services</a>
         <a href="#why">Why Us</a>
+        <a href="#gallery">Our Work</a>
         <a href="#process">Process</a>
         <a href="#contact">Contact</a>
       </nav>
@@ -120,6 +121,18 @@
       </div>
     </section>
 
+    <!-- Gallery (populated from Mixing Station via Supabase, hidden if empty) -->
+    <section id="gallery" class="section" hidden>
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow bracket">Our Work</div>
+          <h2>Recent installs</h2>
+        </div>
+        <div id="gallery-portfolio" class="gallery-portfolio"></div>
+        <div id="gallery-general" class="grid grid-4" style="margin-top: 22px;"></div>
+      </div>
+    </section>
+
     <!-- Process -->
     <section id="process" class="section">
       <div class="wrap">
@@ -157,6 +170,105 @@
       <a href="https://mixingstation.netlify.app" target="_blank" rel="noopener">Employee Sign In</a>
     </div>
   </footer>
+
+  <!--
+    Gallery photos are managed by the client from the Mixing Station app
+    (Marketing Photos page) and stored in Supabase. This is the public
+    anon key — safe to expose; it can only read rows already marked
+    published, per the marketing_photos RLS policy.
+  -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const supabase = createClient(
+      'https://icdjyluqdfwwyikkqtcp.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljZGp5bHVxZGZ3d3lpa2txdGNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzODEyMjQsImV4cCI6MjA5OTk1NzIyNH0.jCS26-2DuJUNTWVY2o2IUxs6QIkhSlu6y1A77BsERjY'
+    )
+
+    function photoUrl(path) {
+      return supabase.storage.from('marketing-photos').getPublicUrl(path).data.publicUrl
+    }
+
+    async function loadGallery() {
+      const { data: photos, error } = await supabase
+        .from('marketing_photos')
+        .select('*')
+        .eq('is_published', true)
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false })
+
+      if (error || !photos || photos.length === 0) return
+
+      const portfolio = photos.filter((p) => p.category === 'portfolio')
+      const general = photos.filter((p) => p.category === 'general')
+      if (portfolio.length === 0 && general.length === 0) return
+
+      const portfolioEl = document.getElementById('gallery-portfolio')
+      const generalEl = document.getElementById('gallery-general')
+
+      // Group portfolio photos into pairs (before/after) and singles
+      const seen = new Set()
+      const items = []
+      for (const p of portfolio) {
+        if (seen.has(p.id)) continue
+        if (p.pair_group) {
+          const partner = portfolio.find((q) => q.id !== p.id && q.pair_group === p.pair_group)
+          if (partner) {
+            seen.add(p.id); seen.add(partner.id)
+            const before = p.pair_role === 'before' ? p : partner
+            const after = p.pair_role === 'after' ? p : partner
+            items.push({ type: 'pair', before, after, label: p.project_label })
+            continue
+          }
+        }
+        seen.add(p.id)
+        items.push({ type: 'single', photo: p })
+      }
+
+      portfolioEl.innerHTML = items.map((item) => {
+        if (item.type === 'pair') {
+          return `
+            <div class="portfolio-item">
+              ${item.label ? `<div class="portfolio-label">${escapeHtml(item.label)}</div>` : ''}
+              <div class="portfolio-pair">
+                <div class="portfolio-half">
+                  <img src="${photoUrl(item.before.storage_path)}" alt="${escapeHtml(item.before.caption || 'Before')}" loading="lazy">
+                  <span class="portfolio-tag">Before</span>
+                </div>
+                <div class="portfolio-half">
+                  <img src="${photoUrl(item.after.storage_path)}" alt="${escapeHtml(item.after.caption || 'After')}" loading="lazy">
+                  <span class="portfolio-tag portfolio-tag-after">After</span>
+                </div>
+              </div>
+            </div>`
+        }
+        return `
+          <div class="portfolio-item">
+            ${item.photo.project_label ? `<div class="portfolio-label">${escapeHtml(item.photo.project_label)}</div>` : ''}
+            <div class="portfolio-single">
+              <img src="${photoUrl(item.photo.storage_path)}" alt="${escapeHtml(item.photo.caption || '')}" loading="lazy">
+            </div>
+          </div>`
+      }).join('')
+
+      generalEl.innerHTML = general.map((p) => `
+        <div class="card gallery-card">
+          <img src="${photoUrl(p.storage_path)}" alt="${escapeHtml(p.caption || '')}" loading="lazy">
+          ${p.caption ? `<p>${escapeHtml(p.caption)}</p>` : ''}
+        </div>
+      `).join('')
+
+      document.getElementById('gallery').hidden = false
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div')
+      div.textContent = str
+      return div.innerHTML
+    }
+
+    loadGallery().catch(() => {})
+  </script>
 
 </body>
 </html>
