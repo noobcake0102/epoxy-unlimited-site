@@ -149,16 +149,107 @@
       </div>
     </section>
 
-    <!-- CTA / Contact -->
+    <!-- Contact / Estimate request -->
     <section id="contact" class="section cta-section">
       <div class="wrap cta-inner">
         <h2>Ready to talk about your floor?</h2>
         <p class="lead">Free on-site estimates, serving Yuma and the surrounding valley. Tell us about the space and we'll get back to you.</p>
-        <div class="hero-ctas">
-          <a class="btn btn-primary" href="mailto:info@epoxyunlimited.com">info@epoxyunlimited.com</a>
-          <a class="btn btn-outline" href="tel:+10000000000">(000) 000-0000</a>
+
+        <form id="leadForm" class="lead-form" novalidate>
+          <!-- Honeypot — bots that fill hidden fields get a silent "success" with no write. -->
+          <input type="text" name="hpField" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;">
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="leadName">Name *</label>
+              <input type="text" id="leadName" name="name" required>
+            </div>
+            <div class="form-field">
+              <label for="leadEmail">Email *</label>
+              <input type="email" id="leadEmail" name="email" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="leadPhone">Phone</label>
+              <input type="tel" id="leadPhone" name="phone">
+            </div>
+            <div class="form-field">
+              <label for="leadAddress">Property Address</label>
+              <input type="text" id="leadAddress" name="address" placeholder="Street, Yuma AZ">
+            </div>
+          </div>
+
+          <div class="form-row form-row-3">
+            <div class="form-field">
+              <label for="leadPropertyType">Property Type</label>
+              <select id="leadPropertyType" name="propertyType">
+                <option value="Residential Garage">Residential Garage</option>
+                <option value="Commercial Space">Commercial Space</option>
+                <option value="Industrial / Warehouse">Industrial / Warehouse</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="leadSqft">Approx. Square Footage</label>
+              <select id="leadSqft" name="sqft">
+                <option value="Under 500 sq ft">Under 500 sq ft</option>
+                <option value="500–1,000 sq ft">500–1,000 sq ft</option>
+                <option value="1,000–2,500 sq ft">1,000–2,500 sq ft</option>
+                <option value="2,500–5,000 sq ft">2,500–5,000 sq ft</option>
+                <option value="5,000+ sq ft">5,000+ sq ft</option>
+                <option value="Not sure">Not sure</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="leadCondition">Current Floor Condition</label>
+              <select id="leadCondition" name="condition">
+                <option value="Bare concrete">Bare concrete</option>
+                <option value="Existing coating — peeling/damaged">Existing coating — peeling/damaged</option>
+                <option value="Existing coating — good condition">Existing coating — good condition</option>
+                <option value="Not sure">Not sure</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row form-row-2b">
+            <div class="form-field">
+              <label for="leadFinish">Desired Finish</label>
+              <select id="leadFinish" name="finish">
+                <option value="epoxy-solid">Solid Color</option>
+                <option value="epoxy-flake">Flake / Chip Blend</option>
+                <option value="epoxy-metallic">Decorative / Metallic</option>
+                <option value="not-sure">Not Sure — Need Guidance</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="leadTimeline">Timeline</label>
+              <select id="leadTimeline" name="timeline">
+                <option value="ASAP">ASAP</option>
+                <option value="Within a month">Within a month</option>
+                <option value="1–3 months">1–3 months</option>
+                <option value="Just exploring">Just exploring</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="leadMessage">Anything else we should know?</label>
+            <textarea id="leadMessage" name="message" rows="3" placeholder="Cracks, oil stains, moisture, sizing quirks — whatever's relevant."></textarea>
+          </div>
+
+          <div id="leadFormError" class="form-error" style="display:none;"></div>
+
+          <button type="submit" class="btn btn-primary" id="leadSubmitBtn" style="width:100%; justify-content:center;">Request a Free Estimate</button>
+        </form>
+
+        <div id="leadFormSuccess" class="form-success" style="display:none;">
+          <h3>Got it — thanks!</h3>
+          <p>We'll review the details and get back to you shortly to schedule a free on-site estimate.</p>
         </div>
-        <p class="fine-print">Contact details are placeholders — update with your real info.</p>
+
+        <p class="fine-print">Or reach us directly at <a href="mailto:info@epoxyunlimited.com" style="color:inherit;text-decoration:underline;">info@epoxyunlimited.com</a> · <a href="tel:+10000000000" style="color:inherit;text-decoration:underline;">(000) 000-0000</a> (placeholder — update with real number)</p>
       </div>
     </section>
 
@@ -268,6 +359,59 @@
     }
 
     loadGallery().catch(() => {})
+
+    // ── Lead form: creates a Draft estimate directly in The Mixing Station ──
+    document.getElementById('leadForm').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      const form = e.target
+      const errorEl = document.getElementById('leadFormError')
+      errorEl.style.display = 'none'
+
+      // Honeypot — bots that fill hidden fields get a silent "success" with no write.
+      if (form.hpField.value.trim() !== '') {
+        form.style.display = 'none'
+        document.getElementById('leadFormSuccess').style.display = 'block'
+        return
+      }
+
+      const name = form.name.value.trim()
+      const email = form.email.value.trim()
+      if (!name || !email) {
+        errorEl.textContent = 'Please fill in your name and email.'
+        errorEl.style.display = 'block'
+        return
+      }
+
+      const submitBtn = document.getElementById('leadSubmitBtn')
+      submitBtn.disabled = true
+      submitBtn.textContent = 'Sending…'
+
+      try {
+        const { error } = await supabase.rpc('submit_lead', {
+          p_customer_name: name,
+          p_customer_email: email,
+          p_customer_phone: form.phone.value.trim(),
+          p_site_address: form.address.value.trim(),
+          p_flooring_types: [form.finish.value],
+          p_message: form.message.value.trim(),
+          p_intake: {
+            property_type: form.propertyType.value,
+            sqft_range: form.sqft.value,
+            floor_condition: form.condition.value,
+            timeline: form.timeline.value,
+          },
+        })
+        if (error) throw error
+        form.style.display = 'none'
+        document.getElementById('leadFormSuccess').style.display = 'block'
+      } catch (err) {
+        console.warn('Lead submit failed:', err)
+        errorEl.textContent = 'Something went wrong sending that — please email info@epoxyunlimited.com directly.'
+        errorEl.style.display = 'block'
+        submitBtn.disabled = false
+        submitBtn.textContent = 'Request a Free Estimate'
+      }
+    })
   </script>
 
 </body>

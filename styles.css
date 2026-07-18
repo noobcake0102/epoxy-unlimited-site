@@ -324,6 +324,73 @@ h1, h2, h3 {
 }
 .footer-inner a:hover { color: var(--terracotta); }
 
+/* ── Lead form ──────────────────────────────────────────────────────────── */
+
+.lead-form {
+  text-align: left;
+  width: 100%;
+  max-width: 720px;
+  margin: 32px auto 0;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  padding: 28px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row-2b { grid-template-columns: 1fr 1fr; }
+.form-field { margin-bottom: 16px; }
+.form-field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sand-50);
+  margin-bottom: 5px;
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.92);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 0.9rem;
+}
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+.form-field textarea { resize: vertical; }
+.form-error {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--terracotta);
+  color: var(--terracotta-dark);
+  padding: 10px 14px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+.form-success {
+  max-width: 480px;
+  margin: 32px auto 0;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  padding: 36px 28px;
+  text-align: center;
+}
+.form-success h3 { color: var(--sand-50); font-size: 1.4rem; margin-bottom: 8px; }
+.form-success p { color: rgba(255,255,255,0.88); margin: 0; }
+
 /* ── Gallery ────────────────────────────────────────────────────────────── */
 
 .gallery-portfolio {
@@ -365,4 +432,6 @@ h1, h2, h3 {
   .grid-3 { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr; }
   .hero { padding: 80px 0 60px; }
+  .form-row, .form-row-3, .form-row-2b { grid-template-columns: 1fr; }
+  .lead-form { padding: 20px; }
 }
