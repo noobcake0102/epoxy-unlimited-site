@@ -103,20 +103,10 @@ h1, h2, h3 {
   gap: 10px;
   margin-right: auto;
 }
-.brand-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1.5px solid var(--terracotta);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--display);
-  font-style: italic;
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--terracotta);
-  background: var(--sand-100);
+.brand-mark-img {
+  height: 42px;
+  width: auto;
+  display: block;
 }
 .brand-word {
   font-family: var(--display);
