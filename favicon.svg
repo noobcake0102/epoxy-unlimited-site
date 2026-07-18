@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eef1f5"/>
+      <stop offset="55%" stop-color="#aab2c0"/>
+      <stop offset="100%" stop-color="#7c8aa0"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="#0A0E18"/>
+  <circle cx="32" cy="32" r="27" stroke="#E0913F" stroke-width="2.5" fill="rgba(224,145,63,0.06)"/>
+  <text x="32" y="41" font-family="Oswald, sans-serif" font-style="italic" font-weight="700" font-size="24" fill="url(#chrome)" text-anchor="middle">EU</text>
+</svg>
